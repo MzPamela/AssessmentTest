@@ -1,0 +1,93 @@
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class WebstaurantTest {
+private static WebDriver driver;
+private static WebDriverWait wait;
+
+@BeforeClass
+public static void setup() {
+// Set the path to the ChromeDriver executable
+System.setProperty("webdriver.chrome.driver", "C:/Drivers/chromedriver.exe");
+
+// Create a WebDriver instance (ChromeDriver)
+driver = new ChromeDriver();
+wait = new WebDriverWait(driver, 10);
+}
+
+@AfterClass  
+public static void teardown() {
+// Close the browser -- I will need to add this to a separate method
+driver.quit();
+}
+
+/**
+ * @throws InterruptedException
+ */
+@Test
+public void testWebstaurant() throws InterruptedException {
+// 1. Go to https://www.webstaurantstore.com/
+driver.get("https://www.webstaurantstore.com/");
+
+// 2. Search for 'stainless work table'.
+WebElement searchInput = driver.findElement(By.id("searchval"));
+searchInput.sendKeys("stainless work table");
+searchInput.sendKeys(Keys.ENTER);
+
+// 3. Check the search result ensuring every product has the word 'Table' in its title.
+boolean allProductsContainTable = true;
+for (WebElement productTitle : driver.findElements(By.cssSelector(".description [title]"))) {
+if (!productTitle.getText().toLowerCase().contains("table")) {
+allProductsContainTable = false;
+break;
+}
+}
+
+if (allProductsContainTable) {
+System.out.println("All products contain 'Table' in their titles.");
+} else {
+System.out.println("Not all products contain 'Table' in their titles.");
+}
+
+// 4. Add the last found item on the last page to Cart.
+WebElement lastPageLink = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".pagination li:last-child a")));
+lastPageLink.click();
+
+// Verify that it is the last page
+WebElement currentPage = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".pagination .current")));
+if (currentPage.getText().equals("Last")) {
+System.out.println("Successfully on the last page.");
+} else {
+System.out.println("Not on the last page.");
+}
+
+WebElement lastProduct = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".description [title]")));
+lastProduct.click();
+
+WebElement addToCartButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("buyButton")));
+addToCartButton.click();
+
+// Wait for the Cart to update 
+wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("cartItemCount"), "1"));
+
+// 5. Empty Cart.
+WebElement cartButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("cartLink")));
+cartButton.click();
+
+WebElement emptyCartButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("emptyCartButton")));
+emptyCartButton.click();
+
+// Verify that the cart is empty
+WebElement cartItemCount = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("cartItemCount")));
+if (cartItemCount.getText().equals("0")) {
+System.out.println("Cart is empty.");
+} else {
+System.out.println("Cart is not empty.");

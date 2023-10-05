@@ -44,7 +44,7 @@ searchInput.sendKeys(Keys.ENTER);
 
 // 3. Check the search result ensuring every product has the word 'Table' in its title.
 boolean allProductsContainTable = true;
-for (WebElement productTitle : driver.findElements(By.cssSelector(".description [title]"))) {
+for (WebElement productTitle : driver.findElements(By.cssSelector(".description [Table]"))) {
 if (!productTitle.getText().toLowerCase().contains("table")) {
 allProductsContainTable = false;
 break;
@@ -69,7 +69,7 @@ System.out.println("Successfully on the last page.");
 System.out.println("Not on the last page.");
 }
 
-WebElement lastProduct = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".description [title]")));
+WebElement lastProduct = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".description [Table]")));
 lastProduct.click();
 
 WebElement addToCartButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("buyButton")));
